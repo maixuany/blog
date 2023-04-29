@@ -1,41 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
-import { useEffect, useState } from 'react';
+import 'devextreme/dist/css/dx.common.css';
+import './themes/generated/theme.base.css';
+import './themes/generated/theme.additional.css';
+import React from 'react';
+import { HashRouter as Router } from 'react-router-dom';
+import './dx-styles.scss';
+import LoadPanel from 'devextreme-react/load-panel';
+import { NavigationProvider } from './contexts/navigation';
+import { AuthProvider, useAuth } from './contexts/auth';
+import { useScreenSizeClass } from './utils/media-query';
+import Content from './Content';
+import UnauthenticatedContent from './UnauthenticatedContent';
 
 function App() {
-  const [text, setText] = useState("test");
-  useEffect(()=>{
-    fetch("http://alene.cf:3000",{method:"GET"})
-    .then((response)=>{
-      console.log(response)
-      return response.json()
-    })
-    .then((data)=>{
-      console.log(data)
-      setText(data.message)
-    })
-    .catch((error)=>{
+  const { user, loading } = useAuth();
 
-    })
-  },[])
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {text}
-        </a>
-      </header>
-    </div>
-  );
+  if (loading) {
+    return <LoadPanel visible={true} />;
+  }
+
+  if (user) {
+    return <Content />;
+  }
+
+  return <UnauthenticatedContent />;
 }
 
-export default App;
+export default function Root() {
+  const screenSizeClass = useScreenSizeClass();
+
+  return (
+    <Router>
+      <AuthProvider>
+        <NavigationProvider>
+          <div className={`app ${screenSizeClass}`}>
+            <App />
+          </div>
+        </NavigationProvider>
+      </AuthProvider>
+    </Router>
+  );
+}
