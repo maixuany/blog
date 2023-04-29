@@ -1,5 +1,3 @@
-import defaultUser from '../utils/default-user';
-
 export async function signIn(email, password) {
   try {
     // Send request
@@ -7,7 +5,6 @@ export async function signIn(email, password) {
 
     return {
       isOk: true,
-      data: defaultUser
     };
   }
   catch {
@@ -23,8 +20,7 @@ export async function getUser() {
     // Send request
 
     return {
-      isOk: true,
-      data: defaultUser
+      isOk: false,
     };
   }
   catch {
