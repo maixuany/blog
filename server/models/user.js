@@ -7,7 +7,7 @@ const UserSchema = new schema({
     password: { type: String, required: true },
     access_tokens: { type: [String], default: [] },
     posts: { type: [schema.Types.ObjectId], default: [], ref: "post" },
-    roles: { type: [schema.Types.ObjectId], ref: "role" }
+    role: { type: schema.Types.ObjectId, ref: "role" }
 })
 
 module.exports = User = mongoose.model("user", UserSchema);

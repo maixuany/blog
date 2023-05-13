@@ -44,7 +44,7 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running at http://51.79.146.32:${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT}`);
 })
 
 mongoose.set("strictQuery", true);
