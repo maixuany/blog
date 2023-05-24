@@ -36,7 +36,15 @@ const authentication = async (req, res, next) => {
 }
 
 const authorization = async (req, res, next) => {
-
+    try {
+        const data = req.data;
+        if (data.role === "ADMIN") next();
+        else {
+            return res.status(httpStatus.FORBIDDEN).send(new ResponseObject("Forbidden"));
+        }
+    } catch (err) {
+        next(err);
+    }
 }
 
 module.exports = { authentication, authorization };
