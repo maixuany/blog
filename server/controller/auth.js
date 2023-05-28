@@ -37,12 +37,14 @@ authController.login = async (req, res, next) => {
 
 authController.logout = async (req, res, next) => {
     try {
-        const user = await userSch.findOne({ email: req.data.email });
+        const user = await User.findOne({ email: req.data.email });
         const array_access_token = user.access_tokens.filter((value) => {
             return value !== req.token;
         });
-        user.access_token = array_access_token;
+        user.access_tokens = array_access_token;
         await user.save();
+        req.data = null;
+        req.token = null;
         return res
             .status(httpStatus.OK)
             .send(new ResponseObject("Logout Success"));
@@ -50,7 +52,5 @@ authController.logout = async (req, res, next) => {
         next(error)
     }
 }
-
-
 
 module.exports = authController;

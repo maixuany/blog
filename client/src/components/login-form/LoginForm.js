@@ -10,27 +10,52 @@ import Form, {
 } from 'devextreme-react/form';
 import LoadIndicator from 'devextreme-react/load-indicator';
 import notify from 'devextreme/ui/notify';
-import { useAuth } from '../../contexts/auth';
 
 import './LoginForm.scss';
+import Axios from 'axios';
+import Cookies from 'js-cookie';
 
 export default function LoginForm() {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const formData = useRef({ email: '', password: '' });
 
-  const onSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    const { email, password } = formData.current;
-    setLoading(true);
+  async function onSubmit(e) {
+    try {
+      e.preventDefault();
+      const { email, password } = formData.current;
+      setLoading(true);
 
-    const result = await signIn(email, password);
-    if (!result.isOk) {
+      const data = JSON.stringify({
+        "email": email,
+        "password": password
+      });
+
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'http://localhost:3030/api/v1/auth/login',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: data
+      };
+
+      const result = await Axios.request(config);
+      console.log(result)
+      if (result.status !== 200) {
+        setLoading(false);
+        notify(result.data.message, 'error', 2000);
+      } else {
+        Cookies.set('token', result.data.data);
+        notify(result.data.message, 'success', 2000);
+        setLoading(false);
+      }
+    } catch (err) {
       setLoading(false);
-      notify(result.message, 'error', 2000);
+      notify("Incorrect email or password", 'error', 2000);
     }
-  }, [signIn]);
+  };
 
   const onCreateAccountClick = useCallback(() => {
     navigate('/create-account');

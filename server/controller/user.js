@@ -126,5 +126,21 @@ userController.deleteOne = async (req, res, next) => {
     }
 }
 
+userController.get_me = async (req, res, next) => {
+    try {
+        const me = await User.findOne({ email: req.data.email });
+        if (!me)
+            return res
+                .status(httpStatus.NOT_FOUND)
+                .send(new ResponseObject("Not found user"));
+        const { password, access_tokens, ...dataRes } = me._doc;
+        return res
+            .status(httpStatus.OK)
+            .send(new ResponseObject("get data success", dataRes));
+    } catch (error) {
+        next(error);
+    }
+}
+
 
 module.exports = userController;

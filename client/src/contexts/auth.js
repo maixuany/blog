@@ -1,38 +1,39 @@
 import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
-import { getUser, signIn as sendSignInRequest } from '../api/auth';
-
+import Cookies from "js-cookie";
+import Axios from 'axios';
 
 function AuthProvider(props) {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
 
+  const config_getme = {
+    method: 'get',
+    url: 'http://localhost:3030/api/v1/user/me',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + Cookies.get("token")
+    }
+  };
+
   useEffect(() => {
     (async function () {
-      const result = await getUser();
-      if (result.isOk) {
-        setUser(result.data);
+      try {
+        const result = await Axios.request(config_getme);
+        if (result.status === 200) {
+          setUser(result.data.data);
+        } else {
+          setUser(undefined);
+        }
+        setLoading(false);
+      } catch (err) {
+        setUser(undefined);
+        setLoading(false);
       }
-
-      setLoading(false);
     })();
   }, []);
 
-  const signIn = useCallback(async (email, password) => {
-    const result = await sendSignInRequest(email, password);
-    if (result.isOk) {
-      setUser(result.data);
-    }
-
-    return result;
-  }, []);
-
-  const signOut = useCallback(() => {
-    setUser(undefined);
-  }, []);
-
-
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut, loading }} {...props} />
+    <AuthContext.Provider value={{ user, loading }} {...props} />
   );
 }
 

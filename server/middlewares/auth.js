@@ -22,6 +22,8 @@ const authentication = async (req, res, next) => {
                 { $pull: { access_tokens: token } },
                 { new: true }
             );
+            req.data = null;
+            req.token = null;
             if (user) {
                 return res.status(httpStatus.UNAUTHORIZED).send(new ResponseObject(
                     `Expired token ${expiredToken} has been removed from user ${user.fullname}`,
